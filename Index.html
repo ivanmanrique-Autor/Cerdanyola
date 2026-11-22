@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Marcador de baloncesto</title>
+<meta name="theme-color" content="#0b0d10">
+<style>
+*{box-sizing:border-box}body{margin:0;padding:4.2vw 3vw 3vw;background:radial-gradient(ellipse at 50% 0,#141419,#08090c 72%);color:#eeeef0;font-family:Arial,Helvetica,sans-serif;text-align:center;min-height:100vh}main{max-width:960px;margin:auto}header{text-align:center;margin-bottom:3.1vw}h1{font-size:clamp(30px,9.1vw,93px);font-weight:900;letter-spacing:-.04em;line-height:.95;margin:0}h1 span{display:block}.subtitle{font-size:clamp(12px,3.55vw,36px);letter-spacing:.1em;font-weight:700;color:#9fa0a6;margin:1.5vw 0 2vw}#searchStatus{font-size:clamp(11px,3.1vw,31px);color:#aaacb2;margin:0;line-height:1.4}#searchStatus:before{content:'';display:inline-block;width:.65em;height:.65em;background:var(--signal,#727782);border-radius:50%;margin-right:.7em}.board{position:relative;border:2px solid #5b5c60;border-radius:clamp(9px,2vw,20px);background:linear-gradient(120deg,#1d1e22,#08090b 40%,#16171a);box-shadow:inset 0 0 0 4px #ffffff08,0 5px 12px #0007;padding:3.8vw 1.2vw 4.8vw}.board:before,.board:after{content:'+';position:absolute;top:1vw;width:1.5vw;height:1.5vw;min-width:8px;min-height:8px;font-size:clamp(7px,1.5vw,15px);line-height:1;border-radius:50%;color:#777;background:#131416;box-shadow:0 0 2px #ccc}.board:before{left:1.5vw}.board:after{right:1.5vw}.teams{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5vw;position:relative}.teams:after{content:'';position:absolute;left:50%;top:-2.2vw;bottom:-2vw;width:1px;background:#414246;box-shadow:1px 0 #000}.team{min-width:0}.name{font-size:clamp(12px,4.2vw,43px);font-weight:800;text-transform:uppercase;line-height:1.08;min-height:2.2em;display:flex;justify-content:center;align-items:center;overflow-wrap:anywhere;padding:0 .3vw}.side{display:block;color:#999ba1;font-size:clamp(9px,2.5vw,25px);letter-spacing:.15em;margin:.4vw 0 1.2vw}.score{display:flex;align-items:center;justify-content:center;padding:.6vw 2vw;background:radial-gradient(circle,#5b3a1e25 .7px,transparent 1px) 0 0/5px 5px}.score svg{width:100%;height:auto;max-height:200px;filter:drop-shadow(0 0 2px #ff8d00) drop-shadow(0 0 7px #f7830040)}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.period-badge{position:absolute;bottom:-.8vw;left:50%;transform:translateX(-50%);white-space:nowrap;border:1px solid #ffb12f;border-radius:clamp(6px,1.4vw,14px);background:#211608;color:#ff9f16;font-size:clamp(12px,3.2vw,33px);font-weight:800;padding:.8vw 2.5vw;box-shadow:0 0 0 3px #ff970012,0 0 8px #ff960035}#periods{margin:4vw 0 3.2vw;border:1px solid #5b5d63;border-radius:clamp(6px,1.3vw,13px);overflow:hidden;background:#ffffff03}#periods:empty{display:none}.period-table{width:100%;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}.period-table th,.period-table td{padding:.9vw .1vw;border-right:1px solid #42454a;border-bottom:1px solid #42454a;font-size:clamp(9px,3vw,30px);font-weight:400;line-height:1.2}.period-table thead th{font-size:clamp(8px,2.55vw,26px);font-weight:700;color:#b6b7bd;background:#ffffff03}.period-table th:first-child{width:27%;text-align:left;padding-left:2.2vw;font-size:clamp(8px,2.65vw,27px);font-weight:750;overflow-wrap:anywhere;text-transform:uppercase}.period-table tr:last-child>*{border-bottom:0}.period-table tr>*:last-child{border-right:0}.last-baskets{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2vw;margin:0 0 2vw}.basket-card{text-align:left;min-width:0;border:1px solid #62646a;border-radius:clamp(6px,1.4vw,14px);padding:1.8vw 2vw;background:linear-gradient(120deg,#ffffff06,#ffffff02)}.basket-heading{font-size:clamp(8px,2.2vw,22px);letter-spacing:.07em;color:#b6b7bd;margin:0 0 1.8vw;font-weight:700;white-space:nowrap}.basket-content{display:grid;grid-template-columns:8vw minmax(0,1fr) auto;align-items:center;gap:1.4vw}.avatar{width:8vw;height:8vw;max-width:84px;max-height:84px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid #777a80;background:linear-gradient(145deg,#45474b,#26282d);font-size:clamp(12px,3vw,30px);font-weight:700;color:#c6c7cb}.avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.basket-player{font-size:clamp(9px,2.65vw,27px);font-weight:750;line-height:1.17;overflow-wrap:anywhere}.basket-detail{font-size:clamp(8px,2.3vw,23px);color:#a4a6ad;margin-top:1vw;line-height:1.2}.basket-points{font-size:clamp(17px,4.5vw,46px);font-weight:800;color:#ff8d00;white-space:nowrap}.basket-card.empty .basket-player{font-size:clamp(9px,2.3vw,23px);font-weight:400;color:#969aa2}.basket-card.empty .basket-points{color:#555b63}#status,#sourceTime{font-size:clamp(9px,2.2vw,22px);line-height:1.4;color:#a1a2a8;margin:.5vw 0}details{text-align:left;border:1px solid #5b5e65;border-radius:clamp(5px,1.2vw,12px);padding:1.8vw 2.5vw;margin:3.2vw 0;background:#ffffff03}summary{font-size:clamp(11px,2.7vw,27px);font-weight:600;cursor:pointer}#searchInfo{font-size:12px;color:#a1a4ac;line-height:1.5}label{display:block;font-size:12px;margin:14px 0 8px;color:#b8bac0}form{display:flex;gap:8px}input{flex:1;min-width:0;background:#111216;color:#ddd;border:1px solid #5b5e65;border-radius:5px;padding:10px;font:inherit;font-size:12px}button,a.action{font:inherit;font-size:clamp(11px,2.7vw,27px);padding:1.2vw 2vw;border:1px solid #bfc0c6;border-radius:clamp(5px,1vw,10px);color:#e4e5e8;text-decoration:none;background:transparent;cursor:pointer;display:inline-flex;gap:1.5vw;align-items:center;justify-content:center}.actions{display:flex;justify-content:center;gap:3vw}.actions>*{width:36%}.action-icon{font-size:1.4em}button:disabled{opacity:.45}[hidden]{display:none!important}:focus-visible{outline:2px solid #ffb12f;outline-offset:3px}#wakeStatus{font-size:clamp(8px,1.8vw,16px)!important;color:#858992!important;margin:1.7vw 0 .5vw!important}footer{font-size:clamp(8px,1.7vw,17px);color:#686c74;letter-spacing:.07em;margin-top:1.5vw}@media(min-width:1024px){body{padding:43px 30px 30px}header{margin-bottom:32px}.subtitle{margin:15px 0 20px}.board{padding:39px 12px 49px}.teams{gap:51px}.name{padding:0 3px}.side{margin:4px 0 12px}.score{padding:6px 20px}.period-badge{bottom:-8px;padding:8px 25px}#periods{margin:41px 0 33px}.last-baskets{gap:20px;margin-bottom:20px}.basket-card{padding:18px 20px}.basket-heading{margin-bottom:18px}.basket-content{grid-template-columns:82px minmax(0,1fr) auto;gap:14px}.basket-detail{margin-top:10px}details{padding:18px 25px;margin:33px 0}button,a.action{padding:12px 20px}.actions{gap:30px}}
+
+.score{background:transparent}.score svg{width:84%;background:transparent;filter:drop-shadow(0 0 1px #ffb000) drop-shadow(0 0 3px #ff820075)}
+
+.mode-selector{display:flex;justify-content:center;gap:0;margin:22px auto 8px;border:1px solid #62646a;border-radius:24px;width:max-content;max-width:100%;padding:3px}.mode-selector button{border:0;border-radius:20px;font-size:13px;padding:10px 20px;color:#999da5;gap:0}.mode-selector button[aria-pressed="true"]{background:#ffab25;color:#16100a;font-weight:750}.manual-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2vw;margin:3.2vw 0 2vw}.manual-team{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.manual-team button{font-size:clamp(15px,4vw,30px);font-weight:750;color:#ffb52e;border-color:#6d542d;min-height:46px;padding:9px 0;background:#ffad1408}.manual-team button:active{background:#ffad1430}.score[role="button"]{cursor:pointer;border-radius:5px}.score[role="button"]:focus-visible{outline:2px solid #ffb12f;outline-offset:3px}
+.score.manual-origin svg{filter:drop-shadow(0 0 1px #ff3030) drop-shadow(0 0 3px #ff303055)}.score.manual-origin svg circle:not([fill="none"]){fill:#ff4545}
+</style>
+<main>
+<header><h1>CERDANYOLA<span>NUROIL C</span></h1><p class="subtitle">MINI MASCULINO</p><p id="searchStatus" role="status">Buscando partido del mini…</p></header>
+<section class="board" aria-label="Marcador global del partido">
+<div class="teams"><div class="team"><div class="name" id="localName">Local</div><span class="side">LOCAL</span><div class="score" id="localScore" aria-live="polite">—</div></div><div class="team"><div class="name" id="visitName">Visitante</div><span class="side">VISITANTE</span><div class="score" id="visitScore" aria-live="polite">—</div></div></div>
+<div class="period-badge" id="currentPeriod">ESPERANDO PARTIDO</div>
+</section>
+<div id="periods" aria-label="Puntos por periodo"></div>
+<section id="lastBaskets" class="last-baskets" aria-label="Última canasta de cada equipo">
+<article class="basket-card empty" id="homeBasket" aria-label="Última canasta del equipo local"><h2 class="basket-heading">ÚLTIMA CANASTA<span hidden id="homeBasketTeam">LOCAL</span></h2><div class="basket-content"><div class="avatar" id="homeBasketAvatar" aria-hidden="true">—</div><div><div class="basket-player" id="homeBasketName">Esperando partido</div><div class="basket-detail" id="homeBasketDetail"></div></div><div class="basket-points" id="homeBasketPoints">—</div></div></article>
+<article class="basket-card empty" id="awayBasket" aria-label="Última canasta del equipo visitante"><h2 class="basket-heading">ÚLTIMA CANASTA<span hidden id="awayBasketTeam">VISITANTE</span></h2><div class="basket-content"><div class="avatar" id="awayBasketAvatar" aria-hidden="true">—</div><div><div class="basket-player" id="awayBasketName">Esperando partido</div><div class="basket-detail" id="awayBasketDetail"></div></div><div class="basket-points" id="awayBasketPoints">—</div></div></article>
+</section>
+<section id="manualControls" class="manual-controls" hidden aria-label="Sumar puntos manualmente"><div class="manual-team"><button type="button" id="localScorePlus1" aria-label="Sumar 1 puntos al equipo local">+1</button><button type="button" id="localScorePlus2" aria-label="Sumar 2 puntos al equipo local">+2</button><button type="button" id="localScorePlus3" aria-label="Sumar 3 puntos al equipo local">+3</button></div><div class="manual-team"><button type="button" id="visitScorePlus1" aria-label="Sumar 1 puntos al equipo visitante">+1</button><button type="button" id="visitScorePlus2" aria-label="Sumar 2 puntos al equipo visitante">+2</button><button type="button" id="visitScorePlus3" aria-label="Sumar 3 puntos al equipo visitante">+3</button></div></section>
+<p id="status" role="status">Esperando el directo…</p><p id="sourceTime"></p>
+<details><summary>Configuración del partido</summary><p id="searchInfo"></p><label for="matchUrl">URL del partido · Se detecta automáticamente</label><form id="matchForm"><input id="matchUrl" type="url" required placeholder="Buscando el directo del mini…" aria-label="URL del partido"><button type="submit">Cargar</button></form></details>
+<div class="actions"><button id="refresh"><span class="action-icon" aria-hidden="true">↻</span>Actualizar</button><a class="action" id="original" hidden href="https://www.basquetcatala.cat/directes" target="_blank" rel="noopener"><span class="action-icon" aria-hidden="true">↗</span>Web original</a></div>
+<p id="wakeStatus" style="font-size:11px;color:#969aa2;margin:16px 0 6px" role="status"></p><button id="wakeRetry" hidden type="button" style="font-size:11px;padding:7px 12px">Mantener pantalla encendida</button>
+<div class="mode-selector" role="group" aria-label="Modo del marcador"><button type="button" id="autoMode" aria-pressed="true">Automático</button><button type="button" id="manualMode" aria-pressed="false">Manual</button></div>
+<footer>CB CERDANYOLA · MARCADOR GLOBAL · V5</footer>
+</main>
+<script>
+'use strict';
+let matchId=null,generation=0;
+const $=id=>document.getElementById(id);
+let busy=false,lastSuccess=null;
+let manualMode=false,awaitingAutoScore=false;
+const displayedScores={localScore:null,visitScore:null};
+const DIGITS={"0":["01111110","11111111","11000011","11000011","11000011","11000011","11000011","11000011","11000011","11000011","11111111","01111110"],"1":["00011000","00111000","01111000","00011000","00011000","00011000","00011000","00011000","00011000","00011000","00111100","00111100"],"2":["01111110","11111111","11000011","00000011","00000011","00111111","01111110","11000000","11000000","11000000","11111111","11111111"],"3":["11111110","11111111","00000011","00000011","00000011","00111110","00111111","00000011","00000011","00000011","11111111","11111110"],"4":["11000011","11000011","11000011","11000011","11000011","11111111","01111111","00000011","00000011","00000011","00000011","00000011"],"5":["11111111","11111111","11000000","11000000","11000000","11111110","01111111","00000011","00000011","11000011","11111111","01111110"],"6":["01111110","11111111","11000000","11000000","11000000","11111110","11111111","11000011","11000011","11000011","11111111","01111110"],"7":["11111111","11111111","00000011","00000011","00000011","00000011","00000011","00000011","00000011","00000011","00000011","00000011"],"8":["01111110","11111111","11000011","11000011","11000011","01111110","01111110","11000011","11000011","11000011","11111111","01111110"],"9":["01111110","11111111","11000011","11000011","11000011","11111111","01111111","00000011","00000011","00000011","11111111","01111110"],"\u2014":["00000000","00000000","00000000","00000000","00000000","11111111","11111111","00000000","00000000","00000000","00000000","00000000"]};
+
+function setScore(id,value){
+ displayedScores[id]=/^\d+$/.test(String(value))?Number(value):null;
+ const el=$(id),text=String(value),display=text==='—'?'——':text.padStart(2,'0');
+ const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+ // Cada cifra tiene exactamente 8 columnas y 12 filas; el paso es uniforme en ambos ejes.
+ svg.setAttribute('viewBox','0 0 '+(display.length*76-8)+' 100');
+ svg.setAttribute('aria-hidden','true');
+ [...display].forEach((char,i)=>(DIGITS[char]||DIGITS['—']).forEach((row,y)=>[...row].forEach((on,x)=>{
+  const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  dot.setAttribute('cx',i*76+x*8+6);dot.setAttribute('cy',y*8+6);dot.setAttribute('r','2.9');
+  dot.setAttribute('fill',on==='1'?'#ffd344':'none');svg.append(dot);
+ })));
+ const label=document.createElement('span');label.className='sr-only';label.textContent=text;
+ el.replaceChildren(label,svg);
+}
+
+// El registro de jugadas identifica las canastas: 92 libre, 93 de dos, 94 triple.
+function lastBasket(data,teamId){
+ if(!Array.isArray(data.moves))return {unavailable:true};
+ const pointsByMove={92:1,93:2,94:3};
+ const moves=data.moves.map((move,index)=>({move,index})).filter(({move})=>
+  Number(move.idTeam)===Number(teamId)&&pointsByMove[Number(move.idMove)]);
+ moves.sort((a,b)=>{
+  const x=a.move,y=b.move;
+  return (Number(x.period)||0)-(Number(y.period)||0)||
+   (Number(y.min)||0)-(Number(x.min)||0)||
+   (Number(y.sec)||0)-(Number(x.sec)||0)||
+   String(x.timestamp||'').localeCompare(String(y.timestamp||''))||a.index-b.index;
+ });
+ const m=moves.length?moves[moves.length-1].move:null;
+ if(!m)return null;
+ const team=(data.teams||[]).find(t=>Number(t.teamIdIntern)===Number(teamId));
+ const player=(team?.players||[]).find(p=>
+  [p.playerIdIntern,p.playerId,p.id,p.actorId].some(id=>id!=null&&m.actorId!=null&&String(id)===String(m.actorId)));
+ let photo=null;
+ // Solo se usa una foto si el propio servicio facilita su URL; no se inventan rutas.
+ if(player?.photoUrl){try{const u=new URL(player.photoUrl);if(u.protocol==='https:')photo=u.href;}catch{}}
+ return {name:m.actorName||'Jugador sin identificar',dorsal:m.actorShirtNumber,
+  points:pointsByMove[Number(m.idMove)],period:m.period,photo};
+}
+function paintBasket(side,basket,teamName){
+ const card=$(side+'Basket'),avatar=$(side+'BasketAvatar');
+ $(side+'BasketTeam').textContent=teamName;
+ card.classList.toggle('empty',!basket||basket.unavailable);
+ avatar.replaceChildren();
+ if(!basket||basket.unavailable){
+  avatar.textContent='—';$(side+'BasketName').textContent=basket?.unavailable?'Información no disponible':'Sin canastas registradas';
+  $(side+'BasketDetail').textContent='';$(side+'BasketPoints').textContent='—';return;
+ }
+ const dorsal=basket.dorsal!=null&&String(basket.dorsal)!==''?String(basket.dorsal):null;
+ avatar.textContent=dorsal!==null?dorsal:'●';
+ if(basket.photo){
+  const img=document.createElement('img');img.alt='';img.referrerPolicy='no-referrer';
+  img.onerror=()=>img.remove();img.src=basket.photo;avatar.append(img);
+ }
+ $(side+'BasketName').textContent=basket.name;
+ $(side+'BasketDetail').textContent=[dorsal!==null?'Dorsal '+dorsal:null,basket.period?'P'+basket.period:null].filter(Boolean).join(' · ');
+ $(side+'BasketPoints').textContent='+'+basket.points;
+}
+function clearBaskets(){
+ paintBasket('home',null,'LOCAL');paintBasket('away',null,'VISITANTE');
+ $('homeBasketName').textContent='Esperando partido';$('awayBasketName').textContent='Esperando partido';
+}
+function renderPeriods(m){
+ const table=document.createElement('table');table.className='period-table';
+ table.setAttribute('aria-label','Parciales por periodo');
+ const head=document.createElement('thead'),row=document.createElement('tr');
+ const blank=document.createElement('th');blank.setAttribute('scope','col');blank.textContent='';row.append(blank);
+ m.periods.forEach(p=>{const th=document.createElement('th');th.setAttribute('scope','col');th.textContent=p.label;row.append(th)});
+ head.append(row);table.append(head);
+ const body=document.createElement('tbody');
+ [['home',m.home],['away',m.away]].forEach(([side,name])=>{
+  const tr=document.createElement('tr'),th=document.createElement('th');th.setAttribute('scope','row');th.textContent=name;tr.append(th);
+  m.periods.forEach(p=>{const td=document.createElement('td');td.textContent=p[side];tr.append(td)});body.append(tr);
+ });
+ table.append(body);$('periods').replaceChildren(table);
+}
+function readMatch(data,expectedId=matchId){
+ if(Number(data.idMatchIntern)!==expectedId||!Array.isArray(data.teams))throw Error('Datos no disponibles');
+ const home=data.teams.find(t=>t.teamIdIntern===data.localId),away=data.teams.find(t=>t.teamIdIntern===data.visitId);
+ if(!home||!away)throw Error('Equipos no disponibles');
+ const getPeriods=t=>{
+  if(!Array.isArray(t.periods)||!t.periods.length)throw Error('Parciales no disponibles');
+  const out=new Map();
+  t.periods.forEach((p,index)=>{
+   const points=Number(p.score);
+   if(p.score==null||!Number.isFinite(points)||points<0)throw Error('Parciales no válidos');
+   out.set(index,points);
+  });
+  return out;
+ };
+ const a=getPeriods(home),b=getPeriods(away);
+ const periods=[...new Set([...a.keys(),...b.keys()])].sort((a,b)=>a-b).map(k=>({label:'P'+(k+1),home:a.get(k)??0,away:b.get(k)??0}));
+ return {home:home.name,away:away.name,totalHome:[...a.values()].reduce((x,y)=>x+y,0),totalAway:[...b.values()].reduce((x,y)=>x+y,0),periods,timestamp:data.timestamp};
+}
+async function update(){
+ if(manualMode||busy||!matchId)return;busy=true;$('refresh').disabled=true;
+ const currentId=matchId,currentGeneration=generation;
+ const endpoint='https://streaming.optimalwayconsulting.com/fcbq/streaming/match-id/'+currentId;
+ try{
+  const response=await fetch(endpoint,{cache:'no-store',credentials:'omit',signal:AbortSignal.timeout(12000)});
+  if(!response.ok)throw Error('HTTP '+response.status);
+  const data=await response.json();
+  if(currentGeneration!==generation)return;
+  const m=readMatch(data,currentId);
+  awaitingAutoScore=false;paintScoreOrigin();
+  $('localName').textContent=m.home;$('visitName').textContent=m.away;
+  paintBasket('home',lastBasket(data,data.localId),'LOCAL');
+  paintBasket('away',lastBasket(data,data.visitId),'VISITANTE');
+  setScore('localScore',m.totalHome);setScore('visitScore',m.totalAway);
+  $('currentPeriod').textContent=Number(data.period)>0?'PERIODO '+Number(data.period):'EN DIRECTO';
+  renderPeriods(m);
+  lastSuccess=new Date();
+  $('status').textContent='Actualización automática cada 5 segundos';
+  $('status').style.color='#969aa2';
+  $('sourceTime').hidden=false;
+  $('sourceTime').textContent=m.timestamp?'Últimos datos de la mesa: '+m.timestamp:'';
+  document.title=m.totalHome+' – '+m.totalAway+' · '+m.home+' – '+m.away;
+ }catch(error){
+  if(currentGeneration!==generation)return;
+  $('status').style.color='#ffb554';
+  $('status').textContent=lastSuccess?'Sin conexión. Se conserva el resultado consultado a las '+lastSuccess.toLocaleTimeString('es-ES')+'. Reintentando…':'No se han podido cargar los datos: '+(error.message||'error de conexión')+'. Se reintentará automáticamente.';
+ }finally{if(currentGeneration===generation){busy=false;$('refresh').disabled=false;}}
+}
+const TEAM_ID=91879;
+const LIST_URL='https://esb.optimalwayconsulting.com/fcbq/1/RkkW1DfCZdra6ASNgqJkXUhw4l6oVJOh/Match/getAllMatchInLiveVisibleWeb';
+const CACHE_KEY='cerdanyola-mini-91879-v1';
+const HOUR=60*60*1000,MINUTE=60000;
+let searchBusy=false,nextSearchAt=0,searchVersion=0;
+function selectMatch(id){
+ matchId=Number(id);generation++;busy=false;lastSuccess=null;
+ const url='https://www.basquetcatala.cat/estadistica/directe/'+matchId;
+ $('matchUrl').value=url;$('original').href=url;$('original').hidden=false;
+ if(!awaitingAutoScore){$('localName').textContent='Local';$('visitName').textContent='Visitante';}
+ if(!awaitingAutoScore){setScore('localScore','—');setScore('visitScore','—');$('currentPeriod').textContent='ESPERANDO PARTIDO';}
+ $('periods').replaceChildren();$('sourceTime').textContent='';clearBaskets();
+ $('status').textContent='Conectando…';document.title='Marcador de baloncesto';
+ update();
+}
+function saveMatch(id){
+ nextSearchAt=Date.now()+HOUR;
+ try{localStorage.setItem(CACHE_KEY,JSON.stringify({id,until:nextSearchAt}));}catch{}
+}
+function searchMessage(text){
+ $('searchInfo').textContent=text;
+ if(awaitingAutoScore){$('searchStatus').textContent='Marcador manual · Esperando conexión';$('searchStatus').style.setProperty('--signal','#ff4545');return;}
+ const found=/encontrado|recuperado|URL cargada/.test(text);
+ $('searchStatus').textContent=found?'Partido encontrado · En directo':text.startsWith('Buscando')?'Buscando directo…':text.startsWith('No se encuentra')?'Sin partido activo':'Sin conexión';
+ $('searchStatus').style.setProperty('--signal',found?'#00cd21':'#727782');
+}
+function decodeList(raw){
+ let data;
+ try{data=JSON.parse(raw);}catch{
+  const bytes=Uint8Array.from(atob(raw.trim()),c=>c.charCodeAt(0));
+  data=JSON.parse(new TextDecoder().decode(bytes));
+ }
+ if(data.result!=='OK'||!Array.isArray(data.messageData))throw Error('Listado no disponible');
+ return data.messageData;
+}
+function findMini(matches){
+ const candidates=matches.filter(m=>
+  (Number(m.idLocalTeam)===TEAM_ID||Number(m.idVisitorTeam)===TEAM_ID)&&
+  /^\d+$/.test(String(m.adGameId))&&Number(m.adGameId)>0&&
+  String(m.state)==='0'&&!m.universallyid&&
+  (m.isLive===true||Boolean(m.matchStartedHour)));
+ if(candidates.length>1)throw Error('Hay varios directos del mini; selecciona la URL manualmente');
+ return candidates[0];
+}
+async function searchMatch(){
+ if(manualMode||searchBusy||Date.now()<nextSearchAt)return;
+ searchBusy=true;
+ const version=searchVersion;
+ searchMessage('Buscando partido del Cerdanyola Nuroil C · Mini…');
+ try{
+  const response=await fetch(LIST_URL,{cache:'no-store',credentials:'omit',signal:AbortSignal.timeout(15000)});
+  if(!response.ok)throw Error('HTTP '+response.status);
+  const found=findMini(decodeList(await response.text()));
+  if(version!==searchVersion)return;
+  if(found){
+   saveMatch(Number(found.adGameId));
+   if(matchId!==Number(found.adGameId))selectMatch(found.adGameId);
+   searchMessage('Partido encontrado · Próxima búsqueda a las '+new Date(nextSearchAt).toLocaleTimeString('es-ES'));
+  }else{
+   nextSearchAt=Date.now()+MINUTE;
+   try{localStorage.removeItem(CACHE_KEY);}catch{}
+   matchId=null;generation++;busy=false;$('refresh').disabled=false;
+   $('matchUrl').value='';$('original').hidden=true;
+   if(!awaitingAutoScore){$('localName').textContent='Local';$('visitName').textContent='Visitante';}
+   if(!awaitingAutoScore){setScore('localScore','—');setScore('visitScore','—');$('currentPeriod').textContent='ESPERANDO PARTIDO';}
+   $('periods').replaceChildren();$('sourceTime').textContent='';clearBaskets();
+   $('status').textContent=awaitingAutoScore?'Resultado manual conservado · Esperando un marcador válido de la web':'Esperando el inicio del directo…';
+   document.title='Marcador de baloncesto';
+   searchMessage('No se encuentra partido activo del mini. Nueva búsqueda en 1 minuto.');
+  }
+ }catch(error){
+  if(version!==searchVersion)return;
+  nextSearchAt=Date.now()+MINUTE;
+  searchMessage('No se ha podido comprobar el listado: '+error.message+'. Reintento en 1 minuto.');
+ }finally{searchBusy=false;}
+}
+$('matchForm').onsubmit=event=>{
+ event.preventDefault();
+ if(manualMode)return;
+ try{
+  const url=new URL($('matchUrl').value.trim());
+  const match=url.pathname.match(/^\/estadistica\/directe\/(\d+)\/?$/);
+  if(!['www.basquetcatala.cat','basquetcatala.cat'].includes(url.hostname)||url.protocol!=='https:'||!match||Number(match[1])<=0)throw Error();
+  searchVersion++;saveMatch(Number(match[1]));selectMatch(match[1]);
+  searchMessage('URL cargada · Búsqueda automática pausada durante 1 hora.');
+ }catch{alert('Pega una URL como https://www.basquetcatala.cat/estadistica/directe/303865');}
+};
+function manualTitle(){
+ document.title=(displayedScores.localScore??'—')+' – '+(displayedScores.visitScore??'—')+' · Marcador manual';
+}
+function addManualPoints(id,points){
+ if(!manualMode)return;
+ // Si no había datos, el primer punto inicia el partido en 0–0.
+ for(const key of ['localScore','visitScore'])if(displayedScores[key]===null)setScore(key,0);
+ setScore(id,displayedScores[id]+points);manualTitle();
+}
+function editManualScore(id){
+ if(!manualMode)return;
+ const name=$(id==='localScore'?'localName':'visitName').textContent;
+ const answer=prompt('Resultado de '+name+':',String(displayedScores[id]??0));
+ if(answer===null)return;
+ const text=answer.trim(),number=Number(text);
+ if(!/^\d+$/.test(text)||!Number.isSafeInteger(number)||number<0){alert('Introduce un número entero de puntos, igual o mayor que 0.');return;}
+ setScore(id,number);manualTitle();
+}
+function paintScoreOrigin(){
+ for(const id of ['localScore','visitScore'])$(id).classList.toggle('manual-origin',awaitingAutoScore&&!manualMode);
+}
+function changeMode(manual){
+ if(manualMode===manual)return;
+ manualMode=manual;generation++;searchVersion++;busy=false;
+ awaitingAutoScore=!manual;paintScoreOrigin();
+ // Se invalidan las consultas pendientes, sin tocar las cifras visibles.
+ $('lastBaskets').hidden=manual;$('manualControls').hidden=!manual;
+ $('manualMode').setAttribute('aria-pressed',String(manual));$('autoMode').setAttribute('aria-pressed',String(!manual));
+ $('refresh').disabled=manual;$('matchUrl').disabled=manual;
+ for(const id of ['localScore','visitScore']){
+  if(manual){$(id).setAttribute('role','button');$(id).setAttribute('tabindex','0');$(id).setAttribute('aria-label','Editar resultado '+(id==='localScore'?'local':'visitante'));}
+  else{$(id).removeAttribute('role');$(id).removeAttribute('tabindex');$(id).removeAttribute('aria-label');}
+ }
+ if(manual){
+  $('searchStatus').textContent='Modo manual';$('searchStatus').style.setProperty('--signal','#ffab25');
+  $('status').textContent='Toca +1, +2 o +3 para sumar. Toca el resultado para corregirlo.';
+  $('status').style.color='#969aa2';$('sourceTime').hidden=true;
+ }else{
+  $('searchStatus').textContent='Marcador manual · Esperando conexión';$('searchStatus').style.setProperty('--signal','#ff4545');
+  $('status').textContent='Resultado manual conservado · Se actualizará al recibir datos válidos';$('sourceTime').hidden=true;
+  nextSearchAt=0;
+  // La siguiente consulta periódica traerá el resultado de la web; el cambio de modo no lo modifica.
+ }
+}
+$('autoMode').onclick=()=>changeMode(false);$('manualMode').onclick=()=>changeMode(true);
+for(const id of ['localScore','visitScore']){
+ for(const n of [1,2,3])$(id+'Plus'+n).onclick=()=>addManualPoints(id,n);
+ $(id).onclick=()=>editManualScore(id);
+ $(id).onkeydown=event=>{if(manualMode&&(event.key==='Enter'||event.key===' ')){event.preventDefault();editManualScore(id);}};
+}
+$('refresh').onclick=()=>{if(matchId)update();else searchMatch();};
+function tick(){if(manualMode)return;searchMatch();if(matchId)update();}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
+try{
+ const saved=JSON.parse(localStorage.getItem(CACHE_KEY));
+ if(saved&&Number.isInteger(saved.id)&&saved.id>0&&saved.until>Date.now()&&saved.until<=Date.now()+HOUR){
+  nextSearchAt=saved.until;selectMatch(saved.id);
+  searchMessage('Partido recuperado · Próxima búsqueda a las '+new Date(nextSearchAt).toLocaleTimeString('es-ES'));
+ }
+}catch{}
+if(!matchId){setScore('localScore','—');setScore('visitScore','—');searchMatch();}
+setInterval(tick,5000);
+
+// Screen Wake Lock: mantiene la pantalla encendida solo mientras la página está visible.
+let screenLock=null,wakePending=false;
+async function keepScreenAwake(){
+ if(document.hidden||wakePending||screenLock&&!screenLock.released)return;
+ if(!('wakeLock' in navigator)){
+  $('wakeStatus').textContent='Este navegador no permite mantener la pantalla encendida automáticamente.';
+  return;
+ }
+ wakePending=true;
+ try{
+  const lock=await navigator.wakeLock.request('screen');
+  if(document.hidden){await lock.release();return;}
+  screenLock=lock;
+  $('wakeStatus').textContent='Pantalla encendida mientras el marcador esté visible';
+  $('wakeRetry').hidden=true;
+  lock.addEventListener('release',()=>{
+   if(screenLock!==lock)return;
+   screenLock=null;
+   $('wakeStatus').textContent=document.hidden?'':'El móvil ha desactivado el bloqueo de pantalla.';
+   $('wakeRetry').hidden=document.hidden;
+  });
+ }catch{
+  $('wakeStatus').textContent='No se ha podido mantener la pantalla encendida. Pulsa para reintentar.';
+  $('wakeRetry').hidden=false;
+ }finally{wakePending=false;}
+}
+$('wakeRetry').onclick=keepScreenAwake;
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)keepScreenAwake();});
+window.addEventListener('pageshow',keepScreenAwake);
+document.addEventListener('pointerdown',()=>{if(!screenLock)keepScreenAwake();},{passive:true});
+keepScreenAwake();
+
+</script>
+</html>
