@@ -13,6 +13,14 @@
 .score.manual-origin svg{filter:drop-shadow(0 0 1px #ff3030) drop-shadow(0 0 3px #ff303055)}.score.manual-origin svg circle:not([fill="none"]){fill:#ff4545}
 
 .actions:has(#fcbqDirects:not([hidden]))>#original{display:none}
+
+.score-editor{width:min(340px,calc(100% - 32px));padding:22px;border:1px solid #62646a;border-radius:12px;background:#15161b;color:#eeeef0;text-align:left}
+.score-editor::backdrop{background:#000a}
+.score-editor label{margin:0 0 12px;font-size:16px;line-height:1.4}
+.score-editor form{display:block}
+.score-editor input{width:100%;font-size:28px;text-align:center;padding:12px;color:#ffb52e}
+.score-editor-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+.score-editor-actions button{font-size:14px;padding:10px 16px}
 </style>
 <main>
 <header><h1>CERDANYOLA<span>NUROIL C</span></h1><p class="subtitle">MINI MASCULINO</p><p id="searchStatus" role="status">Buscando partido del mini…</p></header>
@@ -33,6 +41,14 @@
 <div class="mode-selector" role="group" aria-label="Modo del marcador"><button type="button" id="autoMode" aria-pressed="true">Automático</button><button type="button" id="manualMode" aria-pressed="false">Manual</button></div>
 <footer>CB CERDANYOLA · MARCADOR GLOBAL · V5</footer>
 </main>
+<dialog id="scoreEditor" class="score-editor" aria-labelledby="scoreEditLabel">
+<form id="scoreEditForm" novalidate>
+<label id="scoreEditLabel" for="scoreEditInput">Editar resultado</label>
+<input id="scoreEditInput" type="text" inputmode="numeric" pattern="[0-9]*" enterkeyhint="done" autocomplete="off" autocapitalize="off" spellcheck="false" required aria-describedby="scoreEditError">
+<p id="scoreEditError" role="alert" style="font-size:12px;color:#ff7777;margin:8px 0 0"></p>
+<div class="score-editor-actions"><button type="button" id="scoreEditCancel">Cancelar</button><button type="submit">Guardar</button></div>
+</form>
+</dialog>
 <script>
 'use strict';
 let matchId=null,generation=0;
@@ -262,15 +278,30 @@ function addManualPoints(id,points){
  for(const key of ['localScore','visitScore'])if(displayedScores[key]===null)setScore(key,0);
  setScore(id,displayedScores[id]+points);manualTitle();
 }
+let editingScoreId=null;
 function editManualScore(id){
  if(!manualMode)return;
+ editingScoreId=id;
  const name=$(id==='localScore'?'localName':'visitName').textContent;
- const answer=prompt('Resultado de '+name+':',String(displayedScores[id]??0));
- if(answer===null)return;
- const text=answer.trim(),number=Number(text);
- if(!/^\d+$/.test(text)||!Number.isSafeInteger(number)||number<0){alert('Introduce un número entero de puntos, igual o mayor que 0.');return;}
- setScore(id,number);manualTitle();
+ $('scoreEditLabel').textContent='Resultado de '+name;
+ $('scoreEditInput').value=String(displayedScores[id]??0);
+ $('scoreEditError').textContent='';
+ $('scoreEditor').showModal();
+ $('scoreEditInput').focus();
+ $('scoreEditInput').select();
 }
+$('scoreEditCancel').onclick=()=>$('scoreEditor').close();
+$('scoreEditor').addEventListener('close',()=>{editingScoreId=null;});
+$('scoreEditForm').onsubmit=event=>{
+ event.preventDefault();
+ if(!manualMode||!editingScoreId){$('scoreEditor').close();return;}
+ const text=$('scoreEditInput').value.trim(),number=Number(text);
+ if(!/^\d+$/.test(text)||!Number.isSafeInteger(number)||number<0){
+  $('scoreEditError').textContent='Introduce un número entero de puntos, igual o mayor que 0.';
+  $('scoreEditInput').focus();return;
+ }
+ setScore(editingScoreId,number);manualTitle();$('scoreEditor').close();
+};
 function paintScoreOrigin(){
  for(const id of ['localScore','visitScore'])$(id).classList.toggle('manual-origin',awaitingAutoScore&&!manualMode);
 }
