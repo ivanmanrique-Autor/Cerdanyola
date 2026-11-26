@@ -11,6 +11,8 @@
 
 .mode-selector{display:flex;justify-content:center;gap:0;margin:22px auto 8px;border:1px solid #62646a;border-radius:24px;width:max-content;max-width:100%;padding:3px}.mode-selector button{border:0;border-radius:20px;font-size:13px;padding:10px 20px;color:#999da5;gap:0}.mode-selector button[aria-pressed="true"]{background:#ffab25;color:#16100a;font-weight:750}.manual-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2vw;margin:3.2vw 0 2vw}.manual-team{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.manual-team button{font-size:clamp(15px,4vw,30px);font-weight:750;color:#ffb52e;border-color:#6d542d;min-height:46px;padding:9px 0;background:#ffad1408}.manual-team button:active{background:#ffad1430}.score[role="button"]{cursor:pointer;border-radius:5px}.score[role="button"]:focus-visible{outline:2px solid #ffb12f;outline-offset:3px}
 .score.manual-origin svg{filter:drop-shadow(0 0 1px #ff3030) drop-shadow(0 0 3px #ff303055)}.score.manual-origin svg circle:not([fill="none"]){fill:#ff4545}
+
+.actions:has(#fcbqDirects:not([hidden]))>#original{display:none}
 </style>
 <main>
 <header><h1>CERDANYOLA<span>NUROIL C</span></h1><p class="subtitle">MINI MASCULINO</p><p id="searchStatus" role="status">Buscando partido del mini…</p></header>
@@ -26,7 +28,7 @@
 <section id="manualControls" class="manual-controls" hidden aria-label="Sumar puntos manualmente"><div class="manual-team"><button type="button" id="localScorePlus1" aria-label="Sumar 1 puntos al equipo local">+1</button><button type="button" id="localScorePlus2" aria-label="Sumar 2 puntos al equipo local">+2</button><button type="button" id="localScorePlus3" aria-label="Sumar 3 puntos al equipo local">+3</button></div><div class="manual-team"><button type="button" id="visitScorePlus1" aria-label="Sumar 1 puntos al equipo visitante">+1</button><button type="button" id="visitScorePlus2" aria-label="Sumar 2 puntos al equipo visitante">+2</button><button type="button" id="visitScorePlus3" aria-label="Sumar 3 puntos al equipo visitante">+3</button></div></section>
 <p id="status" role="status">Esperando el directo…</p><p id="sourceTime"></p>
 <details><summary>Configuración del partido</summary><p id="searchInfo"></p><label for="matchUrl">URL del partido · Se detecta automáticamente</label><form id="matchForm"><input id="matchUrl" type="url" required placeholder="Buscando el directo del mini…" aria-label="URL del partido"><button type="submit">Cargar</button></form></details>
-<div class="actions"><button id="refresh"><span class="action-icon" aria-hidden="true">↻</span>Actualizar</button><a class="action" id="original" hidden href="https://www.basquetcatala.cat/directes" target="_blank" rel="noopener"><span class="action-icon" aria-hidden="true">↗</span>Web original</a></div>
+<div class="actions"><button id="refresh"><span class="action-icon" aria-hidden="true">↻</span>Actualizar</button><a class="action" id="fcbqDirects" hidden href="https://www.basquetcatala.cat/directes" target="_blank" rel="noopener noreferrer">Directos FCBQ ↗</a><a class="action" id="original" hidden href="https://www.basquetcatala.cat/directes" target="_blank" rel="noopener"><span class="action-icon" aria-hidden="true">↗</span>Web original</a></div>
 <p id="wakeStatus" style="font-size:11px;color:#969aa2;margin:16px 0 6px" role="status"></p><button id="wakeRetry" hidden type="button" style="font-size:11px;padding:7px 12px">Mantener pantalla encendida</button>
 <div class="mode-selector" role="group" aria-label="Modo del marcador"><button type="button" id="autoMode" aria-pressed="true">Automático</button><button type="button" id="manualMode" aria-pressed="false">Manual</button></div>
 <footer>CB CERDANYOLA · MARCADOR GLOBAL · V5</footer>
@@ -278,6 +280,7 @@ function changeMode(manual){
  awaitingAutoScore=!manual;paintScoreOrigin();
  // Se invalidan las consultas pendientes, sin tocar las cifras visibles.
  $('lastBaskets').hidden=manual;$('manualControls').hidden=!manual;
+ $('fcbqDirects').hidden=!manual;
  $('manualMode').setAttribute('aria-pressed',String(manual));$('autoMode').setAttribute('aria-pressed',String(!manual));
  $('refresh').disabled=manual;$('matchUrl').disabled=manual;
  for(const id of ['localScore','visitScore']){
