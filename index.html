@@ -99,23 +99,68 @@ function lastBasket(data,teamId){
  // Solo se usa una foto si el propio servicio facilita su URL; no se inventan rutas.
  if(player?.photoUrl){try{const u=new URL(player.photoUrl);if(u.protocol==='https:')photo=u.href;}catch{}}
  return {name:m.actorName||'Jugador sin identificar',dorsal:m.actorShirtNumber,
-  points:pointsByMove[Number(m.idMove)],period:m.period,photo};
+  points:pointsByMove[Number(m.idMove)],period:m.period,photo,playerUuid:player?.uuid||null};
+}
+const playerPhotoCache=new Map(),playerPhotoRequests=new Map();
+function safePhotoUrl(value){
+ try{const url=new URL(value);return url.protocol==='https:'?url.href:null;}catch{return null;}
+}
+async function getPlayerPhoto(uuid){
+ if(typeof uuid!=='string'||! /^[a-f0-9-]{36}$/i.test(uuid))return null;
+ const cached=playerPhotoCache.get(uuid);
+ if(cached&&cached.until>Date.now())return cached.url;
+ if(playerPhotoRequests.has(uuid))return playerPhotoRequests.get(uuid);
+ const request=(async()=>{
+  try{
+   const endpoint=LIST_URL.replace(/\/Match\/.*$/,'/Federateds/getPhotobyUuidFederat/')+encodeURIComponent(uuid);
+   const response=await fetch(endpoint,{credentials:'omit',signal:AbortSignal.timeout(12000)});
+   if(!response.ok)throw Error('HTTP '+response.status);
+   const rows=decodeList(await response.text());
+   const row=rows.find(p=>String(p.uuid).toLowerCase()===uuid.toLowerCase());
+   // Solo se conserva la URL de la foto, no el resto de la ficha devuelta.
+   const url=safePhotoUrl(row?.photoUrl);
+   playerPhotoCache.set(uuid,{url,until:Date.now()+(url?3600000:300000)});
+   return url;
+  }catch{
+   playerPhotoCache.set(uuid,{url:null,until:Date.now()+60000});
+   return null;
+  }finally{playerPhotoRequests.delete(uuid);}
+ })();
+ playerPhotoRequests.set(uuid,request);
+ return request;
+}
+function paintBasketAvatar(avatar,basket,dorsal){
+ const currentGeneration=generation;
+ const key=currentGeneration+'|'+(basket.playerUuid||basket.name)+'|'+(dorsal??'')+'|'+(basket.photo||'');
+ if(avatar.dataset.photoKey===key)return;
+ avatar.dataset.photoKey=key;avatar.replaceChildren();avatar.textContent=dorsal!==null?dorsal:'●';
+ const showPhoto=url=>{
+  if(!url||manualMode||currentGeneration!==generation||avatar.dataset.photoKey!==key)return;
+  const img=document.createElement('img');img.alt='';img.referrerPolicy='no-referrer';
+  img.onerror=()=>{
+   img.remove();avatar.dataset.photoKey='';
+   if(basket.playerUuid)playerPhotoCache.set(basket.playerUuid,{url:null,until:Date.now()+300000});
+  };
+  img.src=url;avatar.append(img);
+ };
+ const inline=safePhotoUrl(basket.photo);
+ if(inline)showPhoto(inline);
+ else if(basket.playerUuid)getPlayerPhoto(basket.playerUuid).then(url=>{
+  if(avatar.dataset.photoKey!==key||currentGeneration!==generation)return;
+  if(url)showPhoto(url);else avatar.dataset.photoKey='';
+ });
 }
 function paintBasket(side,basket,teamName){
  const card=$(side+'Basket'),avatar=$(side+'BasketAvatar');
  $(side+'BasketTeam').textContent=teamName;
  card.classList.toggle('empty',!basket||basket.unavailable);
- avatar.replaceChildren();
  if(!basket||basket.unavailable){
+  avatar.dataset.photoKey='';avatar.replaceChildren();
   avatar.textContent='—';$(side+'BasketName').textContent=basket?.unavailable?'Información no disponible':'Sin canastas registradas';
   $(side+'BasketDetail').textContent='';$(side+'BasketPoints').textContent='—';return;
  }
  const dorsal=basket.dorsal!=null&&String(basket.dorsal)!==''?String(basket.dorsal):null;
- avatar.textContent=dorsal!==null?dorsal:'●';
- if(basket.photo){
-  const img=document.createElement('img');img.alt='';img.referrerPolicy='no-referrer';
-  img.onerror=()=>img.remove();img.src=basket.photo;avatar.append(img);
- }
+ paintBasketAvatar(avatar,basket,dorsal);
  $(side+'BasketName').textContent=basket.name;
  $(side+'BasketDetail').textContent=[dorsal!==null?'Dorsal '+dorsal:null,basket.period?'P'+basket.period:null].filter(Boolean).join(' · ');
  $(side+'BasketPoints').textContent='+'+basket.points;
