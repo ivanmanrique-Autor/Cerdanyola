@@ -156,13 +156,16 @@ function paintBasketAvatar(avatar,basket,dorsal){
 }
 function paintBasket(side,basket,teamName){
  const card=$(side+'Basket'),avatar=$(side+'BasketAvatar');
+ const unavailable=!basket||Boolean(basket.unavailable);
+ if(unavailable&&card.dataset.hasBasket==='true')return;
  $(side+'BasketTeam').textContent=teamName;
- card.classList.toggle('empty',!basket||basket.unavailable);
+ card.classList.toggle('empty',unavailable);
  if(!basket||basket.unavailable){
   avatar.dataset.photoKey='';avatar.replaceChildren();
   avatar.textContent='—';$(side+'BasketName').textContent=basket?.unavailable?'Información no disponible':'Sin canastas registradas';
   $(side+'BasketDetail').textContent='';$(side+'BasketPoints').textContent='—';return;
  }
+ card.dataset.hasBasket='true';
  const dorsal=basket.dorsal!=null&&String(basket.dorsal)!==''?String(basket.dorsal):null;
  paintBasketAvatar(avatar,basket,dorsal);
  $(side+'BasketName').textContent=basket.name;
@@ -170,6 +173,7 @@ function paintBasket(side,basket,teamName){
  $(side+'BasketPoints').textContent='+'+basket.points;
 }
 function clearBaskets(){
+ $('homeBasket').dataset.hasBasket='false';$('awayBasket').dataset.hasBasket='false';
  latestMatchData=null;
  if($('teamPointsDialog').open)$('teamPointsDialog').close();
  paintBasket('home',null,'LOCAL');paintBasket('away',null,'VISITANTE');
