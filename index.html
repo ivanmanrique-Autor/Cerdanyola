@@ -223,7 +223,7 @@ async function update(){
   const data=await response.json();
   if(currentGeneration!==generation)return;
   const m=readMatch(data,currentId);
-  awaitingAutoScore=false;waitingForData=false;nextDataCheckAt=Date.now()+5000;paintScoreOrigin();
+  awaitingAutoScore=false;waitingForData=false;nextDataCheckAt=Date.now()+3000;paintScoreOrigin();
   $('localName').textContent=m.home;$('visitName').textContent=m.away;
   paintBasket('home',lastBasket(data,data.localId),'LOCAL');
   paintBasket('away',lastBasket(data,data.visitId),'VISITANTE');
@@ -233,16 +233,16 @@ async function update(){
   lastSuccess=new Date();
   $('searchStatus').textContent='Partido encontrado · En directo';
   $('searchStatus').style.setProperty('--signal','#00cd21');
-  $('status').textContent='Actualización automática cada 5 segundos';
+  $('status').textContent='Actualización automática cada 3 segundos';
   $('status').style.color='#969aa2';
   $('sourceTime').hidden=false;
   $('sourceTime').textContent=m.timestamp?'Últimos datos de la mesa: '+m.timestamp:'';
   document.title=m.totalHome+' – '+m.totalAway+' · '+m.home+' – '+m.away;
  }catch(error){
   if(currentGeneration!==generation)return;
-  waitingForData=true;nextDataCheckAt=Date.now()+5000;
+  waitingForData=true;nextDataCheckAt=Date.now()+3000;
   $('status').style.color='#ffb554';
-  $('status').textContent=lastSuccess?'Sin conexión. Se conserva el resultado consultado a las '+lastSuccess.toLocaleTimeString('es-ES')+'. Actualización cada 5 segundos.':'No se han podido cargar los datos: '+(error.message||'error de conexión')+'. Actualización cada 5 segundos.';
+  $('status').textContent=lastSuccess?'Sin conexión. Se conserva el resultado consultado a las '+lastSuccess.toLocaleTimeString('es-ES')+'. Actualización cada 3 segundos.':'No se han podido cargar los datos: '+(error.message||'error de conexión')+'. Actualización cada 3 segundos.';
  }finally{if(currentGeneration===generation){lastConnectionCheck=new Date();busy=false;$('refresh').disabled=false;renderConnectionRetry();}}
 }
 const TEAM_ID=91879;
