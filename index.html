@@ -158,7 +158,7 @@ function readMatch(data,expectedId=matchId){
 }
 function renderConnectionRetry(){
  const line=$('connectionRetry');
- line.hidden=manualMode||!waitingForData;
+ line.hidden=manualMode||Boolean(matchId)||!waitingForData;
  if(line.hidden)return;
  const checked=lastConnectionCheck
   ?lastConnectionCheck.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',timeZone:'Europe/Madrid'})+' '+lastConnectionCheck.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'Europe/Madrid'})
@@ -186,6 +186,8 @@ async function update(){
   $('currentPeriod').textContent=Number(data.period)>0?'PERIODO '+Number(data.period):'EN DIRECTO';
   renderPeriods(m);
   lastSuccess=new Date();
+  $('searchStatus').textContent='Partido encontrado · En directo';
+  $('searchStatus').style.setProperty('--signal','#00cd21');
   $('status').textContent='Actualización automática cada 5 segundos';
   $('status').style.color='#969aa2';
   $('sourceTime').hidden=false;
@@ -193,9 +195,9 @@ async function update(){
   document.title=m.totalHome+' – '+m.totalAway+' · '+m.home+' – '+m.away;
  }catch(error){
   if(currentGeneration!==generation)return;
-  waitingForData=true;nextDataCheckAt=Date.now()+MINUTE;
+  waitingForData=true;nextDataCheckAt=Date.now()+5000;
   $('status').style.color='#ffb554';
-  $('status').textContent=lastSuccess?'Sin conexión. Se conserva el resultado consultado a las '+lastSuccess.toLocaleTimeString('es-ES')+'. Reintentando…':'No se han podido cargar los datos: '+(error.message||'error de conexión')+'. Se reintentará automáticamente.';
+  $('status').textContent=lastSuccess?'Sin conexión. Se conserva el resultado consultado a las '+lastSuccess.toLocaleTimeString('es-ES')+'. Actualización cada 5 segundos.':'No se han podido cargar los datos: '+(error.message||'error de conexión')+'. Actualización cada 5 segundos.';
  }finally{if(currentGeneration===generation){lastConnectionCheck=new Date();busy=false;$('refresh').disabled=false;renderConnectionRetry();}}
 }
 const TEAM_ID=91879;
@@ -211,6 +213,7 @@ function selectMatch(id){
  if(!awaitingAutoScore){setScore('localScore','—');setScore('visitScore','—');$('currentPeriod').textContent='ESPERANDO PARTIDO';}
  $('periods').replaceChildren();$('sourceTime').textContent='';clearBaskets();
  $('status').textContent='Conectando…';document.title='Marcador de baloncesto';
+ renderConnectionRetry();
  update();
 }
 function saveMatch(id){
