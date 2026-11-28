@@ -21,9 +21,11 @@
 .score-editor input{width:100%;font-size:28px;text-align:center;padding:12px;color:#ffb52e}
 .score-editor-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
 .score-editor-actions button{font-size:14px;padding:10px 16px}
+
+#connectionRetry{font-size:clamp(9px,2.35vw,17px);line-height:1.4;color:#92969e;margin:4px 0 0;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:0}
 </style>
 <main>
-<header><h1>CERDANYOLA<span>NUROIL C</span></h1><p class="subtitle">MINI MASCULINO</p><p id="searchStatus" role="status">Buscando partido del mini…</p></header>
+<header><h1>CERDANYOLA<span>NUROIL C</span></h1><p class="subtitle">MINI MASCULINO</p><p id="searchStatus" role="status">Buscando partido del mini…</p><p id="connectionRetry" hidden></p></header>
 <section class="board" aria-label="Marcador global del partido">
 <div class="teams"><div class="team"><div class="name" id="localName">Local</div><span class="side">LOCAL</span><div class="score" id="localScore" aria-live="polite">—</div></div><div class="team"><div class="name" id="visitName">Visitante</div><span class="side">VISITANTE</span><div class="score" id="visitScore" aria-live="polite">—</div></div></div>
 <div class="period-badge" id="currentPeriod">ESPERANDO PARTIDO</div>
@@ -55,6 +57,7 @@ let matchId=null,generation=0;
 const $=id=>document.getElementById(id);
 let busy=false,lastSuccess=null;
 let manualMode=false,awaitingAutoScore=false;
+let waitingForData=true,lastConnectionCheck=null,nextDataCheckAt=0;
 const displayedScores={localScore:null,visitScore:null};
 const DIGITS={"0":["01111110","11111111","11000011","11000011","11000011","11000011","11000011","11000011","11000011","11000011","11111111","01111110"],"1":["00011000","00111000","01111000","00011000","00011000","00011000","00011000","00011000","00011000","00011000","00111100","00111100"],"2":["01111110","11111111","11000011","00000011","00000011","00111111","01111110","11000000","11000000","11000000","11111111","11111111"],"3":["11111110","11111111","00000011","00000011","00000011","00111110","00111111","00000011","00000011","00000011","11111111","11111110"],"4":["11000011","11000011","11000011","11000011","11000011","11111111","01111111","00000011","00000011","00000011","00000011","00000011"],"5":["11111111","11111111","11000000","11000000","11000000","11111110","01111111","00000011","00000011","11000011","11111111","01111110"],"6":["01111110","11111111","11000000","11000000","11000000","11111110","11111111","11000011","11000011","11000011","11111111","01111110"],"7":["11111111","11111111","00000011","00000011","00000011","00000011","00000011","00000011","00000011","00000011","00000011","00000011"],"8":["01111110","11111111","11000011","11000011","11000011","01111110","01111110","11000011","11000011","11000011","11111111","01111110"],"9":["01111110","11111111","11000011","11000011","11000011","11111111","01111111","00000011","00000011","00000011","11111111","01111110"],"\u2014":["00000000","00000000","00000000","00000000","00000000","11111111","11111111","00000000","00000000","00000000","00000000","00000000"]};
 
@@ -153,8 +156,20 @@ function readMatch(data,expectedId=matchId){
  const periods=[...new Set([...a.keys(),...b.keys()])].sort((a,b)=>a-b).map(k=>({label:'P'+(k+1),home:a.get(k)??0,away:b.get(k)??0}));
  return {home:home.name,away:away.name,totalHome:[...a.values()].reduce((x,y)=>x+y,0),totalAway:[...b.values()].reduce((x,y)=>x+y,0),periods,timestamp:data.timestamp};
 }
+function renderConnectionRetry(){
+ const line=$('connectionRetry');
+ line.hidden=manualMode||!waitingForData;
+ if(line.hidden)return;
+ const checked=lastConnectionCheck
+  ?lastConnectionCheck.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',timeZone:'Europe/Madrid'})+' '+lastConnectionCheck.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'Europe/Madrid'})
+  :'—';
+ const due=matchId?nextDataCheckAt:nextSearchAt;
+ const remaining=Math.max(0,Math.ceil((due-Date.now())/1000));
+ const countdown=String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(remaining%60).padStart(2,'0');
+ line.textContent='Última comprobación: '+checked+' · Reintento '+((busy||searchBusy)?'…':countdown);
+}
 async function update(){
- if(manualMode||busy||!matchId)return;busy=true;$('refresh').disabled=true;
+ if(manualMode||busy||!matchId||Date.now()<nextDataCheckAt)return;busy=true;$('refresh').disabled=true;
  const currentId=matchId,currentGeneration=generation;
  const endpoint='https://streaming.optimalwayconsulting.com/fcbq/streaming/match-id/'+currentId;
  try{
@@ -163,7 +178,7 @@ async function update(){
   const data=await response.json();
   if(currentGeneration!==generation)return;
   const m=readMatch(data,currentId);
-  awaitingAutoScore=false;paintScoreOrigin();
+  awaitingAutoScore=false;waitingForData=false;nextDataCheckAt=Date.now()+5000;paintScoreOrigin();
   $('localName').textContent=m.home;$('visitName').textContent=m.away;
   paintBasket('home',lastBasket(data,data.localId),'LOCAL');
   paintBasket('away',lastBasket(data,data.visitId),'VISITANTE');
@@ -178,9 +193,10 @@ async function update(){
   document.title=m.totalHome+' – '+m.totalAway+' · '+m.home+' – '+m.away;
  }catch(error){
   if(currentGeneration!==generation)return;
+  waitingForData=true;nextDataCheckAt=Date.now()+MINUTE;
   $('status').style.color='#ffb554';
   $('status').textContent=lastSuccess?'Sin conexión. Se conserva el resultado consultado a las '+lastSuccess.toLocaleTimeString('es-ES')+'. Reintentando…':'No se han podido cargar los datos: '+(error.message||'error de conexión')+'. Se reintentará automáticamente.';
- }finally{if(currentGeneration===generation){busy=false;$('refresh').disabled=false;}}
+ }finally{if(currentGeneration===generation){lastConnectionCheck=new Date();busy=false;$('refresh').disabled=false;renderConnectionRetry();}}
 }
 const TEAM_ID=91879;
 const LIST_URL='https://esb.optimalwayconsulting.com/fcbq/1/RkkW1DfCZdra6ASNgqJkXUhw4l6oVJOh/Match/getAllMatchInLiveVisibleWeb';
@@ -188,7 +204,7 @@ const CACHE_KEY='cerdanyola-mini-91879-v1';
 const HOUR=60*60*1000,MINUTE=60000;
 let searchBusy=false,nextSearchAt=0,searchVersion=0;
 function selectMatch(id){
- matchId=Number(id);generation++;busy=false;lastSuccess=null;
+ matchId=Number(id);generation++;busy=false;lastSuccess=null;waitingForData=true;nextDataCheckAt=0;
  const url='https://www.basquetcatala.cat/estadistica/directe/'+matchId;
  $('matchUrl').value=url;$('original').href=url;$('original').hidden=false;
  if(!awaitingAutoScore){$('localName').textContent='Local';$('visitName').textContent='Visitante';}
@@ -243,6 +259,7 @@ async function searchMatch(){
   }else{
    nextSearchAt=Date.now()+MINUTE;
    try{localStorage.removeItem(CACHE_KEY);}catch{}
+   waitingForData=true;
    matchId=null;generation++;busy=false;$('refresh').disabled=false;
    $('matchUrl').value='';$('original').hidden=true;
    if(!awaitingAutoScore){$('localName').textContent='Local';$('visitName').textContent='Visitante';}
@@ -256,7 +273,7 @@ async function searchMatch(){
   if(version!==searchVersion)return;
   nextSearchAt=Date.now()+MINUTE;
   searchMessage('No se ha podido comprobar el listado: '+error.message+'. Reintento en 1 minuto.');
- }finally{searchBusy=false;}
+ }finally{searchBusy=false;if(version===searchVersion){lastConnectionCheck=new Date();renderConnectionRetry();}}
 }
 $('matchForm').onsubmit=event=>{
  event.preventDefault();
@@ -309,6 +326,7 @@ function changeMode(manual){
  if(manualMode===manual)return;
  manualMode=manual;generation++;searchVersion++;busy=false;
  awaitingAutoScore=!manual;paintScoreOrigin();
+ if(!manual){waitingForData=true;nextDataCheckAt=0;}
  // Se invalidan las consultas pendientes, sin tocar las cifras visibles.
  $('lastBaskets').hidden=manual;$('manualControls').hidden=!manual;
  $('fcbqDirects').hidden=!manual;
@@ -328,6 +346,7 @@ function changeMode(manual){
   nextSearchAt=0;
   // La siguiente consulta periódica traerá el resultado de la web; el cambio de modo no lo modifica.
  }
+ renderConnectionRetry();
 }
 $('autoMode').onclick=()=>changeMode(false);$('manualMode').onclick=()=>changeMode(true);
 for(const id of ['localScore','visitScore']){
@@ -335,8 +354,8 @@ for(const id of ['localScore','visitScore']){
  $(id).onclick=()=>editManualScore(id);
  $(id).onkeydown=event=>{if(manualMode&&(event.key==='Enter'||event.key===' ')){event.preventDefault();editManualScore(id);}};
 }
-$('refresh').onclick=()=>{if(matchId)update();else searchMatch();};
-function tick(){if(manualMode)return;searchMatch();if(matchId)update();}
+$('refresh').onclick=()=>{if(manualMode)return;if(matchId){nextDataCheckAt=0;update();}else{nextSearchAt=0;searchMatch();}renderConnectionRetry();};
+function tick(){if(manualMode)return;searchMatch();if(matchId)update();renderConnectionRetry();}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
 try{
  const saved=JSON.parse(localStorage.getItem(CACHE_KEY));
@@ -346,7 +365,8 @@ try{
  }
 }catch{}
 if(!matchId){setScore('localScore','—');setScore('visitScore','—');searchMatch();}
-setInterval(tick,5000);
+renderConnectionRetry();
+setInterval(tick,1000);
 
 // Screen Wake Lock: mantiene la pantalla encendida solo mientras la página está visible.
 let screenLock=null,wakePending=false;
