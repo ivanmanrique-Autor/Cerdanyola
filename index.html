@@ -453,8 +453,8 @@ function changeMode(manual){
  $('manualMode').setAttribute('aria-pressed',String(manual));$('autoMode').setAttribute('aria-pressed',String(!manual));
  $('refresh').disabled=manual;$('matchUrl').disabled=manual;
  for(const id of ['localScore','visitScore']){
-  if(manual){$(id).setAttribute('role','button');$(id).setAttribute('tabindex','0');$(id).setAttribute('aria-label','Editar resultado '+(id==='localScore'?'local':'visitante'));}
-  else{$(id).removeAttribute('role');$(id).removeAttribute('tabindex');$(id).removeAttribute('aria-label');}
+  $(id).setAttribute('role','button');$(id).setAttribute('tabindex','0');$(id).setAttribute('aria-haspopup','dialog');
+  $(id).setAttribute('aria-label',(manual?'Editar resultado ':'Ver anotadores del equipo ')+(id==='localScore'?'local':'visitante'));
  }
  if(manual){
   $('searchStatus').textContent='Modo manual';$('searchStatus').style.setProperty('--signal','#ffab25');
@@ -471,8 +471,11 @@ function changeMode(manual){
 $('autoMode').onclick=()=>changeMode(false);$('manualMode').onclick=()=>changeMode(true);
 for(const id of ['localScore','visitScore']){
  for(const n of [1,2,3])$(id+'Plus'+n).onclick=()=>addManualPoints(id,n);
- $(id).onclick=()=>editManualScore(id);
- $(id).onkeydown=event=>{if(manualMode&&(event.key==='Enter'||event.key===' ')){event.preventDefault();editManualScore(id);}};
+ const activate=()=>{if(manualMode)editManualScore(id);else openTeamPoints(id==='localScore'?'home':'away');};
+ $(id).setAttribute('role','button');$(id).setAttribute('tabindex','0');$(id).setAttribute('aria-haspopup','dialog');
+ $(id).setAttribute('aria-label','Ver anotadores del equipo '+(id==='localScore'?'local':'visitante'));
+ $(id).onclick=activate;
+ $(id).onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();activate();}};
 }
 $('refresh').onclick=()=>{if(manualMode)return;if(matchId){nextDataCheckAt=0;update();}else{nextSearchAt=0;searchMatch();}renderConnectionRetry();};
 function tick(){if(manualMode)return;searchMatch();if(matchId)update();renderConnectionRetry();}
